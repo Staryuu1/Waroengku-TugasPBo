@@ -1,16 +1,5 @@
 # waroengku
 
-A new Flutter project.
+WaroengKu adalah aplikasi prototype berbasis Flutter + Dart yang dikembangkan untuk memenuhi tugas mata kuliah Pemrograman Berorientasi Objek (PBO).
+Aplikasi ini menerapkan konsep OOP dan menggunakan SQLite sebagai database lokal 
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
