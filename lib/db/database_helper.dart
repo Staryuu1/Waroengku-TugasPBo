@@ -42,7 +42,8 @@ class DatabaseHelper {
             name TEXT,
             price INTEGER,
             stock INTEGER,
-            category_id INTEGER
+            category_id INTEGER,
+            image_path TEXT
           )
         ''');
       },

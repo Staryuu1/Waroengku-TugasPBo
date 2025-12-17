@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+
 import '../../../models/product.dart';
 import '../../../models/category.dart';
 import '../../../services/product_service.dart';
@@ -18,6 +22,9 @@ class _ProductPageState extends State<ProductPage> {
   List<Product> _products = [];
   List<Category> _categories = [];
 
+  File? _imageFile;
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -25,42 +32,180 @@ class _ProductPageState extends State<ProductPage> {
   }
 
   Future<void> _loadData() async {
+    setState(() => _isLoading = true);
     _products = await _productService.getAll();
     _categories = await _categoryService.getAll();
-    setState(() {});
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+
+    if (picked != null) {
+      final dir = await getApplicationDocumentsDirectory();
+      final newPath =
+          '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+      final newFile = await File(picked.path).copy(newPath);
+
+      setState(() {
+        _imageFile = newFile;
+      });
+    }
+  }
+
+  String _getCategoryName(int categoryId) {
+    final category = _categories.firstWhere(
+      (c) => c.id == categoryId,
+      orElse: () => Category(id: 0, name: 'Unknown'),
+    );
+    return category.name;
   }
 
   void _showForm({Product? product}) {
     final nameCtrl = TextEditingController(text: product?.name ?? '');
-    final priceCtrl = TextEditingController(text: product?.price.toString() ?? '');
-    final stockCtrl = TextEditingController(text: product?.stock.toString() ?? '');
+    final priceCtrl =
+        TextEditingController(text: product?.price.toString() ?? '');
+    final stockCtrl =
+        TextEditingController(text: product?.stock.toString() ?? '');
 
     int? selectedCategory = product?.categoryId;
+
+    _imageFile = null;
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(product == null ? 'Tambah Produk' : 'Edit Produk'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF6584).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                product == null ? Icons.add_shopping_cart : Icons.edit,
+                color: const Color(0xFFFF6584),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              product == null ? 'Tambah Produk' : 'Edit Produk',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
         content: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
+              // Image Preview
+              GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey[300]!, width: 2),
+                  ),
+                  child: _imageFile != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.file(
+                            _imageFile!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : product?.imagePath != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: Image.file(
+                                File(product!.imagePath!),
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_photo_alternate_outlined,
+                                  size: 50,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Tap untuk pilih gambar',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Form Fields
               TextField(
                 controller: nameCtrl,
-                decoration: const InputDecoration(labelText: 'Nama Produk'),
+                decoration: InputDecoration(
+                  labelText: 'Nama Produk',
+                  prefixIcon: const Icon(Icons.shopping_bag_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
               ),
+              const SizedBox(height: 16),
+
               TextField(
                 controller: priceCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Harga'),
+                decoration: InputDecoration(
+                  labelText: 'Harga',
+                  prefixIcon: const Icon(Icons.money),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
               ),
+              const SizedBox(height: 16),
+
               TextField(
                 controller: stockCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Stok'),
+                decoration: InputDecoration(
+                  labelText: 'Stok',
+                  prefixIcon: const Icon(Icons.inventory_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
               ),
+              const SizedBox(height: 16),
+
               DropdownButtonFormField<int>(
                 value: selectedCategory,
-                decoration: const InputDecoration(labelText: 'Kategori'),
+                decoration: InputDecoration(
+                  labelText: 'Kategori',
+                  prefixIcon: const Icon(Icons.category_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
                 items: _categories
                     .map(
                       (c) => DropdownMenuItem(
@@ -77,11 +222,25 @@ class _ProductPageState extends State<ProductPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(
+              'Batal',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
-              if (selectedCategory == null) return;
+              if (selectedCategory == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Pilih kategori terlebih dahulu')),
+                );
+                return;
+              }
 
               final data = Product(
                 id: product?.id,
@@ -89,6 +248,7 @@ class _ProductPageState extends State<ProductPage> {
                 price: int.parse(priceCtrl.text),
                 stock: int.parse(stockCtrl.text),
                 categoryId: selectedCategory!,
+                imagePath: _imageFile?.path ?? product?.imagePath,
               );
 
               product == null
@@ -98,7 +258,56 @@ class _ProductPageState extends State<ProductPage> {
               Navigator.pop(context);
               _loadData();
             },
-            child: const Text('Simpan'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF6584),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Simpan',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(Product product) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+            SizedBox(width: 12),
+            Text('Konfirmasi Hapus'),
+          ],
+        ),
+        content: Text('Apakah Anda yakin ingin menghapus "${product.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await _productService.delete(product.id!);
+              Navigator.pop(context);
+              _loadData();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Produk berhasil dihapus')),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Hapus'),
           ),
         ],
       ),
@@ -108,39 +317,218 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Produk')),
-      floatingActionButton: FloatingActionButton(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Produk',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black87),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showForm(),
-        child: const Icon(Icons.add),
+        backgroundColor: const Color(0xFFFF6584),
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah Produk'),
       ),
-      body: ListView.builder(
-        itemCount: _products.length,
-        itemBuilder: (_, i) {
-          final p = _products[i];
-          return Card(
-            child: ListTile(
-              title: Text(p.name),
-              subtitle: Text('Harga: ${p.price} | Stok: ${p.stock}'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => _showForm(product: p),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _products.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 80,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Belum ada produk',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Tap tombol + untuk menambah produk',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () async {
-                      await _productService.delete(p.id!);
-                      _loadData();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _products.length,
+                  itemBuilder: (_, i) {
+                    final p = _products[i];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => _showForm(product: p),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                // Product Image
+                                Hero(
+                                  tag: 'product_${p.id}',
+                                  child: Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.grey[100],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: p.imagePath != null
+                                          ? Image.file(
+                                              File(p.imagePath!),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Icon(
+                                              Icons.image_not_supported,
+                                              size: 40,
+                                              color: Colors.grey[400],
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+
+                                // Product Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        p.name,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF6C63FF)
+                                              .withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          _getCategoryName(p.categoryId),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF6C63FF),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Rp ${p.price.toString().replaceAllMapped(
+                                                  RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                                  (Match m) => '${m[1]}.',
+                                                )}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.green[700],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Icon(
+                                            Icons.inventory_outlined,
+                                            size: 16,
+                                            color: Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${p.stock} pcs',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Action Buttons
+                                Column(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.edit_outlined,
+                                        color: Color(0xFF6C63FF),
+                                      ),
+                                      onPressed: () => _showForm(product: p),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: const Color(0xFF6C63FF)
+                                            .withOpacity(0.1),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_outline,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () =>
+                                          _showDeleteConfirmation(p),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor:
+                                            Colors.red.withOpacity(0.1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
