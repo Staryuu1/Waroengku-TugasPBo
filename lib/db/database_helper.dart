@@ -20,16 +20,31 @@ class DatabaseHelper {
     return await openDatabase(
       path,
       version: 1,
-      onCreate: (db, version) {
-        return db.execute(
-          '''
+      onCreate: (db, version) async {
+        await db.execute('''
           CREATE TABLE users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE,
             password TEXT
           )
-          ''',
-        );
+        ''');
+
+        await db.execute('''
+          CREATE TABLE categories(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            price INTEGER,
+            stock INTEGER,
+            category_id INTEGER
+          )
+        ''');
       },
     );
   }
