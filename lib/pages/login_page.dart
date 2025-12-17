@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
                 );
 
                 if (user != null) {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder:(_) => const MainPage()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder:(_) =>  MainPage(user: user)));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Login failed")),

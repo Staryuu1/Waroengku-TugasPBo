@@ -1,76 +1,77 @@
 import 'package:flutter/material.dart';
+import '../models/user.dart';
 import '../services/auth_service.dart';
 import 'login_page.dart';
+import './Main/management_page.dart';
+import './Main/pos_page.dart';
+import 'Main/reports_pages.dart';
 
+class MainPage extends StatefulWidget {
+  final User user;
 
-class MainPage extends StatelessWidget {
-  const MainPage({super.key});
+  const MainPage({super.key, required this.user});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int _selectedIndex = 0;
+
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = const [
+      ManagementPage(),
+      PosPage(),
+      ReportPage(),
+    ];
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: const Text("Dashboard WaroengKu"),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.logout),
-          onPressed: () async {
-            await AuthService().logout();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginPage()),
-            );
-          },
-        )
-      ],
-    ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _menuButton(
-              context,
-              title: "Management",
-              icon: Icons.inventory,
-              onTap: () {
-                // nanti ke halaman management
-              },
-            ),
-            _menuButton(
-              context,
-              title: "Transaksi (POS)",
-              icon: Icons.point_of_sale,
-              onTap: () {
-                // nanti ke POS
-              },
-            ),
-            _menuButton(
-              context,
-              title: "Reports",
-              icon: Icons.bar_chart,
-              onTap: () {
-                // nanti ke laporan
-              },
-            ),
-          ],
-        ),
+        title: Text("Halo, ${widget.user.username}"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await AuthService().logout();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+              );
+            },
+          )
+        ],
       ),
-    );
-  }
-
-  Widget _menuButton(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: Icon(icon, size: 32),
-        title: Text(title, style: const TextStyle(fontSize: 18)),
-        trailing: const Icon(Icons.arrow_forward_ios),
-        onTap: onTap,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory),
+            label: 'Management',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.point_of_sale),
+            label: 'POS',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Reports',
+          ),
+        ],
       ),
     );
   }

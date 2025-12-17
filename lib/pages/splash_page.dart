@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../models/user.dart';
 import 'login_page.dart';
 import 'main_page.dart';
 
@@ -20,12 +21,12 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _checkLogin() async {
-    bool isLogin = await auth.isLogin();
+    User? user = await auth.getLoggedInUser();
 
-    if (isLogin) {
+    if (user != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainPage()),
+        MaterialPageRoute(builder: (_) =>  MainPage(user: user)),
       );
     } else {
       Navigator.pushReplacement(
