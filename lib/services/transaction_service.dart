@@ -1,6 +1,5 @@
-import 'package:sqflite/sqflite.dart';
 import '../db/database_helper.dart';
-import '../models/product.dart';
+
 
 class TransactionService {
   final dbHelper = DatabaseHelper.instance;
