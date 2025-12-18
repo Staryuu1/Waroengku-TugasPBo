@@ -5,6 +5,7 @@ class Product {
   final int stock;
   final int categoryId;
   final String? imagePath;
+  final String? barcode;
 
   Product({
     this.id,
@@ -13,6 +14,7 @@ class Product {
     required this.stock,
     required this.categoryId,
     required this.imagePath,
+    this.barcode,
   });
 
   /// Convert Object → Map (untuk SQLite)
@@ -24,6 +26,7 @@ class Product {
       'stock': stock,
       'category_id': categoryId,
       'image_path': imagePath,
+      'barcode': barcode,
     };
   }
 
@@ -36,7 +39,7 @@ class Product {
       stock: map['stock'],
       categoryId: map['category_id'],
       imagePath: map['image_path'],
-
+      barcode: map['barcode'],
     );
   }
 }

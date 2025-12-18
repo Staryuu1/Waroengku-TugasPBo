@@ -31,4 +31,21 @@ class ProductService {
       whereArgs: [id],
     );
   }
+
+  Future<Product?> getByBarcode(String barcode) async {
+    final db = await DatabaseHelper.instance.database;
+
+    final result = await db.query(
+      'products',
+      where: 'barcode = ?',
+      whereArgs: [barcode],
+      limit: 1,
+    );
+
+    if (result.isNotEmpty) {
+      return Product.fromMap(result.first);
+    }
+    return null;
+  }
+
 }

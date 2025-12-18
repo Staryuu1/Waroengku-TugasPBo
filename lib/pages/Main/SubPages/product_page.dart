@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../models/product.dart';
 import '../../../models/category.dart';
@@ -38,6 +39,8 @@ class _ProductPageState extends State<ProductPage> {
     setState(() => _isLoading = false);
   }
 
+  
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -54,6 +57,7 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
+  
   String _getCategoryName(int categoryId) {
     final category = _categories.firstWhere(
       (c) => c.id == categoryId,
@@ -62,12 +66,99 @@ class _ProductPageState extends State<ProductPage> {
     return category.name;
   }
 
+  void _scanBarcode(TextEditingController barcodeCtrl) {
+    final controller = MobileScannerController(
+      detectionSpeed: DetectionSpeed.noDuplicates,
+      facing: CameraFacing.back,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (scannerContext) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            title: const Text('Scan Barcode'),
+            backgroundColor: Colors.black,
+            elevation: 0,
+          ),
+          body: Stack(
+            children: [
+              /// CAMERA
+              MobileScanner(
+                controller: controller,
+                onDetect: (capture) async {
+                  final code = capture.barcodes.first.rawValue;
+                  if (code == null) return;
+
+                  // ⛔ WAJIB: hentikan kamera dulu
+                  await controller.stop();
+
+                  barcodeCtrl.text = code;
+
+                  if (!scannerContext.mounted) return;
+                  Navigator.pop(scannerContext);
+                },
+              ),
+
+              /// FRAME SCAN
+              Center(
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFF4CAF50),
+                      width: 3,
+                    ),
+                  ),
+                ),
+              ),
+
+              /// TEXT BAWAH
+              Positioned(
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Text(
+                      'Arahkan kamera ke barcode',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) {
+      // 🧹 BERSIHKAN RESOURCE
+      controller.dispose();
+    });
+  }
+
+
+
   void _showForm({Product? product}) {
     final nameCtrl = TextEditingController(text: product?.name ?? '');
-    final priceCtrl =
-        TextEditingController(text: product?.price.toString() ?? '');
-    final stockCtrl =
-        TextEditingController(text: product?.stock.toString() ?? '');
+    final priceCtrl = TextEditingController(text: product?.price.toString() ?? '');
+    final stockCtrl = TextEditingController(text: product?.stock.toString() ?? '');
+    final barcodeCtrl = TextEditingController(text: product?.barcode ?? '');
+
 
     int? selectedCategory = product?.categoryId;
 
@@ -149,8 +240,26 @@ class _ProductPageState extends State<ProductPage> {
                 ),
               ),
               const SizedBox(height: 20),
+              
+          
+              
+              TextField(
+                controller: barcodeCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Barcode',
+                  prefixIcon: IconButton(icon: const Icon(Icons.qr_code_scanner), onPressed: () {
+                    _scanBarcode(barcodeCtrl);
+                  },),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
+              ),
 
-              // Form Fields
+              const SizedBox(height: 16),
               TextField(
                 controller: nameCtrl,
                 decoration: InputDecoration(
@@ -249,6 +358,7 @@ class _ProductPageState extends State<ProductPage> {
                 stock: int.parse(stockCtrl.text),
                 categoryId: selectedCategory!,
                 imagePath: _imageFile?.path ?? product?.imagePath,
+                barcode: barcodeCtrl.text.isNotEmpty ? barcodeCtrl.text : null,
               );
 
               product == null

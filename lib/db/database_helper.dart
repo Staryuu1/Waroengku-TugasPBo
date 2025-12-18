@@ -43,9 +43,29 @@ class DatabaseHelper {
             price INTEGER,
             stock INTEGER,
             category_id INTEGER,
-            image_path TEXT
+            image_path TEXT,
+            barcode TEXT UNIQUE
           )
         ''');
+
+        await db.execute('''
+          CREATE TABLE transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            total INTEGER,
+            created_at TEXT
+          )
+        ''');
+
+        await db.execute('''
+          CREATE TABLE transaction_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            transaction_id INTEGER,
+            product_id INTEGER,
+            price INTEGER,
+            qty INTEGER
+          )
+        ''');
+
       },
     );
   }

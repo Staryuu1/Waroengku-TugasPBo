@@ -25,8 +25,8 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     _pages = const [
       ManagementPage(),
-      PosPage(),
-      ReportPage(),
+      POSPage(),
+      ReportsPage(),
     ];
   }
 
@@ -36,14 +36,25 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Halo, ${widget.user.username}"),
+  void _showLogoutConfirmation() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.logout, color: Colors.orange, size: 28),
+            SizedBox(width: 12),
+            Text('Keluar Aplikasi?'),
+          ],
+        ),
+        content: const Text('Anda akan keluar dari akun Anda'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
             onPressed: () async {
               await AuthService().logout();
               Navigator.pushReplacement(
@@ -51,27 +62,130 @@ class _MainPageState extends State<MainPage> {
                 MaterialPageRoute(builder: (_) => const LoginPage()),
               );
             },
-          )
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Keluar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Definisikan warna untuk setiap tab
+    final List<Color> tabColors = [
+      const Color(0xFF6C63FF), // Management - Purple
+      const Color(0xFF4CAF50), // Cashier - Green
+      const Color(0xFFFF6584), // Reports - Pink
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: tabColors[_selectedIndex],
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                _selectedIndex == 0
+                    ? Icons.inventory_2
+                    : _selectedIndex == 1
+                        ? Icons.store
+                        : Icons.bar_chart,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Halo, ${widget.user.username}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                    _selectedIndex == 0
+                        ? 'Management'
+                        : _selectedIndex == 1
+                            ? 'Cashier'
+                            : 'Reports',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: _showLogoutConfirmation,
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.2),
+            ),
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory),
-            label: 'Management',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          backgroundColor: Colors.white,
+          selectedItemColor: tabColors[_selectedIndex],
+          unselectedItemColor: Colors.grey[400],
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.point_of_sale),
-            label: 'POS',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Reports',
-          ),
-        ],
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.inventory_2_outlined),
+              activeIcon: Icon(Icons.inventory_2),
+              label: 'Management',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.store_outlined),
+              activeIcon: Icon(Icons.store),
+              label: 'Cashier',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined),
+              activeIcon: Icon(Icons.bar_chart),
+              label: 'Reports',
+            ),
+          ],
+        ),
       ),
     );
   }
