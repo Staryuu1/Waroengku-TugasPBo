@@ -29,7 +29,7 @@ class CategoryService {
 
   Future<int> delete(int id) async {
     final db = await _db.database;
-    if ( (await ProductService().getByCategoryId(id)).isNotEmpty) {
+    if ((await ProductService().getByCategoryId(id)).isNotEmpty) {
       return -1;
     }
     return await db.delete(
