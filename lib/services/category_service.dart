@@ -1,5 +1,6 @@
 import '../db/database_helper.dart';
 import '../models/category.dart';
+import 'product_service.dart';
 
 class CategoryService {
   final DatabaseHelper _db = DatabaseHelper.instance;
@@ -28,6 +29,9 @@ class CategoryService {
 
   Future<int> delete(int id) async {
     final db = await _db.database;
+    if ( (await ProductService().getByCategoryId(id)).isNotEmpty) {
+      return -1;
+    }
     return await db.delete(
       'categories',
       where: 'id = ?',

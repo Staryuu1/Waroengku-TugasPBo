@@ -48,4 +48,16 @@ class ProductService {
     return null;
   }
 
+  Future<List<Product>> getByCategoryId(int categoryId) async {
+    final db = await DatabaseHelper.instance.database;
+
+    final result = await db.query(
+      'products',
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+
+    return result.map((e) => Product.fromMap(e)).toList();
+  }
+
 }

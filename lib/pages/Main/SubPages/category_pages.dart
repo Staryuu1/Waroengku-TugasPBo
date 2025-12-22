@@ -160,7 +160,18 @@ class _CategoryPageState extends State<CategoryPage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              await _service.delete(category.id!);
+              final delCat = await _service.delete(category.id!);
+              if (delCat == -1) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Gagal menghapus kategori. Terdapat produk yang terkait dengan kategori ini.',
+                    ),
+                  ),
+                );
+                return;
+              }
               Navigator.pop(context);
               _loadCategories();
               ScaffoldMessenger.of(context).showSnackBar(

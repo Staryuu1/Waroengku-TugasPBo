@@ -121,8 +121,8 @@ class _MainPageState extends State<MainPage> {
                     _selectedIndex == 0
                         ? 'Management'
                         : _selectedIndex == 1
-                            ? 'Cashier'
-                            : 'Reports',
+                            ? 'Kasir'
+                            : 'Laporan',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 12,
@@ -177,12 +177,12 @@ class _MainPageState extends State<MainPage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.store_outlined),
               activeIcon: Icon(Icons.store),
-              label: 'Cashier',
+              label: 'Kasir',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_outlined),
               activeIcon: Icon(Icons.bar_chart),
-              label: 'Reports',
+              label: 'Laporan',
             ),
           ],
         ),
