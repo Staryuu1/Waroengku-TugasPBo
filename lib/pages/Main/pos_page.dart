@@ -7,6 +7,7 @@ import '../../models/category.dart';
 import '../../services/product_service.dart';
 import '../../services/category_service.dart';
 import '../../services/transaction_service.dart';
+import '../../services/receipt_service.dart';
 
 /// =======================
 /// CART ITEM
@@ -98,9 +99,26 @@ class _POSPageState extends State<POSPage> {
 
   String _format(int value) {
     return value.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+  }
+
+  Future<void> _receipt_export({required int paid, required int change}) async {
+    await ReceiptService.previewReceipt(
+      total: _total,
+      paid: paid,
+      change: change,
+      items: _cart
+          .map(
+            (e) => ReceiptItem(
+              name: e.product.name,
+              price: e.product.price,
+              qty: e.qty,
+            ),
+          )
+          .toList(),
+    );
   }
 
   /// =======================
@@ -127,10 +145,7 @@ class _POSPageState extends State<POSPage> {
                   color: const Color(0xFF4CAF50).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
-                  Icons.payments,
-                  color: Color(0xFF4CAF50),
-                ),
+                child: const Icon(Icons.payments, color: Color(0xFF4CAF50)),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -195,7 +210,10 @@ class _POSPageState extends State<POSPage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
               child: Text(
                 'Batal',
@@ -219,15 +237,15 @@ class _POSPageState extends State<POSPage> {
                           )
                           .toList();
 
-                      await _transactionService.saveTransaction(
-                        _total,
-                        items,
-                      );
+                      await _transactionService.saveTransaction(_total, items);
 
                       Navigator.pop(context);
                       setState(() => _cart.clear());
                       await _loadProducts();
-
+                      // await _receipt_export(
+                      //   paid: paid,
+                      //   change: change,
+                      // );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -240,7 +258,10 @@ class _POSPageState extends State<POSPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4CAF50),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -257,22 +278,11 @@ class _POSPageState extends State<POSPage> {
     );
   }
 
-  Widget _row(
-    String label,
-    String value, {
-    bool bold = false,
-    Color? color,
-  }) {
+  Widget _row(String label, String value, {bool bold = false, Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
         Text(
           value,
           style: TextStyle(
@@ -318,8 +328,7 @@ class _POSPageState extends State<POSPage> {
                   // ⛔ STOP CAMERA DULU
                   await controller.stop();
 
-                  final product =
-                      await _productService.getByBarcode(code);
+                  final product = await _productService.getByBarcode(code);
 
                   if (!scannerContext.mounted) return;
                   Navigator.pop(scannerContext);
@@ -374,10 +383,7 @@ class _POSPageState extends State<POSPage> {
                     ),
                     child: const Text(
                       'Arahkan kamera ke barcode',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                 ),
@@ -426,10 +432,7 @@ class _POSPageState extends State<POSPage> {
                         child: Text('Semua Kategori'),
                       ),
                       ..._categories.map(
-                        (c) => DropdownMenuItem(
-                          value: c,
-                          child: Text(c.name),
-                        ),
+                        (c) => DropdownMenuItem(value: c, child: Text(c.name)),
                       ),
                     ],
                     onChanged: (v) {
@@ -445,7 +448,10 @@ class _POSPageState extends State<POSPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner, color: Colors.white),
+                    icon: const Icon(
+                      Icons.qr_code_scanner,
+                      color: Colors.white,
+                    ),
                     onPressed: _scanBarcode,
                     iconSize: 28,
                     padding: const EdgeInsets.all(16),
@@ -548,13 +554,17 @@ class _POSPageState extends State<POSPage> {
                                   Icon(
                                     Icons.inventory_outlined,
                                     size: 14,
-                                    color: inStock ? Colors.grey[600] : Colors.red,
+                                    color: inStock
+                                        ? Colors.grey[600]
+                                        : Colors.red,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${p.stock}',
                                     style: TextStyle(
-                                      color: inStock ? Colors.grey[600] : Colors.red,
+                                      color: inStock
+                                          ? Colors.grey[600]
+                                          : Colors.red,
                                       fontSize: 13,
                                     ),
                                   ),
@@ -564,7 +574,9 @@ class _POSPageState extends State<POSPage> {
                             trailing: IconButton(
                               icon: Icon(
                                 Icons.add_circle,
-                                color: inStock ? const Color(0xFF4CAF50) : Colors.grey,
+                                color: inStock
+                                    ? const Color(0xFF4CAF50)
+                                    : Colors.grey,
                                 size: 32,
                               ),
                               onPressed: inStock ? () => _addToCart(p) : null,
@@ -576,10 +588,7 @@ class _POSPageState extends State<POSPage> {
             ),
           ),
 
-          Container(
-            height: 1,
-            color: Colors.grey[300],
-          ),
+          Container(height: 1, color: Colors.grey[300]),
 
           /// CART
           Expanded(

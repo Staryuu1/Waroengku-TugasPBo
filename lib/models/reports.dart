@@ -58,16 +58,10 @@ class CategoryReport {
   final String categoryName;
   final int totalRevenue;
 
-  CategoryReport({
-    required this.categoryName,
-    required this.totalRevenue,
-  });
+  CategoryReport({required this.categoryName, required this.totalRevenue});
 
   Map<String, dynamic> toMap() {
-    return {
-      'categoryName': categoryName,
-      'totalRevenue': totalRevenue,
-    };
+    return {'categoryName': categoryName, 'totalRevenue': totalRevenue};
   }
 
   factory CategoryReport.fromMap(Map<String, dynamic> map) {

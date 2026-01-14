@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
+import '../services/backup_service.dart';
+import 'package:file_selector/file_selector.dart';
 import 'login_page.dart';
 import './Main/management_page.dart';
 import './Main/pos_page.dart';
@@ -23,11 +25,83 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    _pages = const [
-      ManagementPage(),
-      POSPage(),
-      ReportsPage(),
-    ];
+    _pages = const [ManagementPage(), POSPage(), ReportsPage()];
+  }
+
+  final BackupService _backupService = BackupService();
+  bool _busy = false;
+
+  Future<void> _backupData() async {
+    setState(() => _busy = true);
+    try {
+      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final suggested = 'waroengku_backup_$timestamp.db';
+      final XTypeGroup typeGroup = XTypeGroup(
+        label: 'Database',
+        extensions: ['db'],
+      );
+
+      String? savePath;
+      try {
+        savePath = await getSavePath(
+          suggestedName: suggested,
+          acceptedTypeGroups: [typeGroup],
+        );
+      } catch (e) {
+        // Some platforms or plugin versions may not implement getSavePath;
+        // fall back to internal backup destination.
+        savePath = null;
+      }
+
+      String path;
+      if (savePath != null) {
+        path = await _backupService.backupDatabaseToPath(savePath);
+      } else {
+        path = await _backupService.backupDatabase();
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Backup disimpan: $path')));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Backup gagal: ${e.toString()}')));
+    } finally {
+      setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _restoreData() async {
+    setState(() => _busy = true);
+    try {
+      final XTypeGroup typeGroup = XTypeGroup(
+        label: 'Database',
+        extensions: ['db'],
+      );
+      final XFile? file = await openFile(acceptedTypeGroups: [typeGroup]);
+      if (file == null) return;
+
+      await _backupService.restoreDatabaseFromPath(file.path);
+
+      // After restore, force logout so user can login to restored DB
+      await AuthService().logout();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Restore berhasil, silakan login ulang.')),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Restore gagal: ${e.toString()}')));
+    } finally {
+      setState(() => _busy = false);
+    }
   }
 
   void _onItemTapped(int index) {
@@ -98,8 +172,8 @@ class _MainPageState extends State<MainPage> {
                 _selectedIndex == 0
                     ? Icons.inventory_2
                     : _selectedIndex == 1
-                        ? Icons.store
-                        : Icons.bar_chart,
+                    ? Icons.store
+                    : Icons.bar_chart,
                 color: Colors.white,
                 size: 24,
               ),
@@ -121,8 +195,8 @@ class _MainPageState extends State<MainPage> {
                     _selectedIndex == 0
                         ? 'Management'
                         : _selectedIndex == 1
-                            ? 'Kasir'
-                            : 'Laporan',
+                        ? 'Kasir'
+                        : 'Laporan',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 12,
@@ -134,12 +208,40 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: _showLogoutConfirmation,
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.2),
+          if (_busy)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Center(
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
             ),
+          PopupMenuButton<String>(
+            color: Colors.white,
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onSelected: (value) {
+              if (value == 'backup') {
+                _backupData();
+              } else if (value == 'restore') {
+                _restoreData();
+              } else if (value == 'logout') {
+                _showLogoutConfirmation();
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'backup', child: Text('Backup Data')),
+              const PopupMenuItem(
+                value: 'restore',
+                child: Text('Restore Data'),
+              ),
+              const PopupMenuItem(value: 'logout', child: Text('Logout')),
+            ],
           ),
           const SizedBox(width: 8),
         ],
@@ -165,9 +267,7 @@ class _MainPageState extends State<MainPage> {
           unselectedFontSize: 12,
           type: BottomNavigationBarType.fixed,
           elevation: 0,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.inventory_2_outlined),
