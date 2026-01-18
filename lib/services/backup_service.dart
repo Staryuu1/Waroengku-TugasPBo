@@ -8,9 +8,8 @@ class BackupService {
     return join(await getDatabasesPath(), 'waroengku.db');
   }
 
-  /// Copies the app database to application's documents/backups folder and
-  /// returns the created backup file path.
-  Future<String> backupDatabase() async {
+  /// Backup database ke /Documents/WaroengKu/
+  Future<String> backupDatabaseToDocuments() async {
     final dbPath = await _getDatabasePath();
     final dbFile = File(dbPath);
 
@@ -18,43 +17,31 @@ class BackupService {
       throw Exception('Database file not found');
     }
 
-    final docs = await getApplicationDocumentsDirectory();
-    final backupDir = Directory(join(docs.path, 'backups'));
-    if (!await backupDir.exists()) await backupDir.create(recursive: true);
+    // 📁 Ambil Documents folder
+    final dir = await getExternalStorageDirectory();
+    if (dir == null) {
+      throw Exception('External storage not available');
+    }
+
+    // 🔥 Ubah path ke Documents
+    final documentsPath = '/storage/emulated/0/Documents/WaroengKu';
+    final backupDir = Directory(documentsPath);
+
+    if (!await backupDir.exists()) {
+      await backupDir.create(recursive: true);
+    }
 
     final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
     final backupPath = join(backupDir.path, 'waroengku_backup_$timestamp.db');
 
-    final backupFile = await dbFile.copy(backupPath);
-    return backupFile.path;
-  }
-
-  /// Copies the app database to the given destination path.
-  /// Caller is responsible for providing a valid file path (including filename).
-  Future<String> backupDatabaseToPath(String destinationPath) async {
-    final dbPath = await _getDatabasePath();
-    final dbFile = File(dbPath);
-
-    if (!await dbFile.exists()) {
-      throw Exception('Database file not found');
-    }
-
-    final destFile = File(destinationPath);
-    // Ensure parent directory exists
-    final parent = destFile.parent;
-    if (!await parent.exists()) {
-      await parent.create(recursive: true);
-    }
-
-    final copied = await dbFile.copy(destinationPath);
+    final copied = await dbFile.copy(backupPath);
     return copied.path;
   }
 
-  /// Replaces the app database with the provided source file path.
+  /// Restore database dari path tertentu
   Future<void> restoreDatabaseFromPath(String sourcePath) async {
     final dbPath = await _getDatabasePath();
 
-    // Delete existing db (this closes it as well) before copying
     try {
       await deleteDatabase(dbPath);
     } catch (_) {}

@@ -21,35 +21,32 @@ class _SetupPageState extends State<SetupPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isSetupComplete', true);
     setState(() => _working = false);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-    );
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+    }
   }
 
   Future<void> _onCreateAccount() async {
-    // Navigate to register page and only complete setup if register succeeded
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (_) => const RegisterPage()),
     );
 
     if (result == true) {
-      // successful register -> mark setup complete and go to login
       await _setSetupCompleteAndGoToLogin();
     } else {
-      // registration canceled or failed -> stay on setup
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration not completed')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registrasi tidak selesai')),
+        );
+      }
     }
   }
 
-  void _onRestoreData() {
-    _restoreFlow();
-  }
-
-  Future<void> _restoreFlow() async {
+  Future<void> _onRestoreData() async {
     setState(() => _working = true);
     try {
       final XTypeGroup typeGroup = XTypeGroup(
@@ -60,70 +57,35 @@ class _SetupPageState extends State<SetupPage> {
       final XFile? file = await openFile(acceptedTypeGroups: [typeGroup]);
       if (file == null) {
         setState(() => _working = false);
-        return; // user canceled
+        return;
       }
 
       final filePath = file.path;
-
       await _backupService.restoreDatabaseFromPath(filePath);
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isSetupComplete', true);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Restore berhasil. Aplikasi akan diarahkan ke login.'),
-        ),
-      );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Restore gagal: ${e.toString()}')));
-      setState(() => _working = false);
-    }
-  }
-
-  Future<void> _onBackupData() async {
-    setState(() => _working = true);
-    try {
-      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-      final suggested = 'waroengku_backup_$timestamp.db';
-      final XTypeGroup typeGroup = XTypeGroup(
-        label: 'Database',
-        extensions: ['db'],
-      );
-
-      String? savePath;
-      try {
-        savePath = await getSavePath(
-          suggestedName: suggested,
-          acceptedTypeGroups: [typeGroup],
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Restore berhasil. Aplikasi akan diarahkan ke login.',
+            ),
+          ),
         );
-      } catch (e) {
-        // Not implemented on some platforms; fallback to internal backup
-        savePath = null;
-      }
 
-      String path;
-      if (savePath != null) {
-        path = await _backupService.backupDatabaseToPath(savePath);
-      } else {
-        path = await _backupService.backupDatabase();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
       }
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Backup disimpan: $path')));
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Backup gagal: ${e.toString()}')));
-    } finally {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Restore gagal: ${e.toString()}')),
+        );
+      }
       setState(() => _working = false);
     }
   }
@@ -131,48 +93,139 @@ class _SetupPageState extends State<SetupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Setup WaroengKu')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Selamat datang! Sebelum mulai, Anda dapat melakukan salah satu tindakan berikut untuk menyiapkan aplikasi:',
-            ),
-            const SizedBox(height: 16),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Logo di kiri atas (PNG)
+              Image.asset(
+                'assets/images/Logo_text.png',
+                height: 60,
+                fit: BoxFit.contain,
+              ),
 
-            ElevatedButton.icon(
-              onPressed: _working ? null : _onRestoreData,
-              icon: const Icon(Icons.restore),
-              label: const Text('Restore Data'),
-            ),
-            const SizedBox(height: 12),
+              const Spacer(),
 
-            ElevatedButton.icon(
-              onPressed: _working ? null : _onBackupData,
-              icon: const Icon(Icons.backup),
-              label: const Text('Backup Data'),
-            ),
-            const SizedBox(height: 12),
-            const SizedBox(height: 12),
+              // Ilustrasi karakter (GIF)
+              Center(
+                child: Column(
+                  children: [
+                    // GIF Illustration
+                    Image.asset(
+                      'assets/images/burnice-burnice-go.gif',
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(height: 32),
 
-            ElevatedButton.icon(
-              onPressed: _working ? null : _onCreateAccount,
-              icon: const Icon(Icons.person_add),
-              label: const Text('Buat Akun'),
-            ),
-            const SizedBox(height: 12),
+                    // Text - rata kiri dan lebih besar
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Siap untuk memulai?',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            'Kelola lebih cepat',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              height: 1.2,
+                            ),
+                          ),
+                          Text(
+                            'Tumbuh lebih jauh',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-            ElevatedButton.icon(
-              onPressed: _working ? null : _setSetupCompleteAndGoToLogin,
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('Lanjut (Lewati)'),
-            ),
-            const Spacer(),
+              const Spacer(),
 
-            if (_working) const Center(child: CircularProgressIndicator()),
-          ],
+              // Buttons
+              Row(
+                children: [
+                  // Import Data button - Hijau
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _working ? null : _onRestoreData,
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(
+                          color: Color(0xFF3DDC84),
+                          width: 2,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Import Data',
+                        style: TextStyle(
+                          color: Color(0xFF3DDC84),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Buat Akun button
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _working ? null : _onCreateAccount,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6C5BE5),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Buat Akun',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Loading indicator
+              if (_working)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

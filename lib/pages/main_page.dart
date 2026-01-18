@@ -34,35 +34,14 @@ class _MainPageState extends State<MainPage> {
   Future<void> _backupData() async {
     setState(() => _busy = true);
     try {
-      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-      final suggested = 'waroengku_backup_$timestamp.db';
-      final XTypeGroup typeGroup = XTypeGroup(
-        label: 'Database',
-        extensions: ['db'],
+      final path = await _backupService.backupDatabaseToDocuments();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Backup disimpan di:\n$path'),
+          duration: const Duration(seconds: 4),
+        ),
       );
-
-      String? savePath;
-      try {
-        savePath = await getSavePath(
-          suggestedName: suggested,
-          acceptedTypeGroups: [typeGroup],
-        );
-      } catch (e) {
-        // Some platforms or plugin versions may not implement getSavePath;
-        // fall back to internal backup destination.
-        savePath = null;
-      }
-
-      String path;
-      if (savePath != null) {
-        path = await _backupService.backupDatabaseToPath(savePath);
-      } else {
-        path = await _backupService.backupDatabase();
-      }
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Backup disimpan: $path')));
     } catch (e) {
       ScaffoldMessenger.of(
         context,
