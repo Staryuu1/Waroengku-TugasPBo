@@ -40,56 +40,56 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    /// HAPUS native splash dengan aman
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
     });
 
-    /// ⏳ DIPERLAMBAT
     _circleController = AnimationController(
-      duration: const Duration(milliseconds: 2200),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
 
     _logoController = AnimationController(
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 1600),
       vsync: this,
     );
 
     _backgroundController = AnimationController(
-      duration: const Duration(milliseconds: 2200),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
 
-    _purplePosition = Tween(begin: -0.65, end: -0.05).animate(
+    // Bulatan ungu: dari atas (y: -0.5) ke tengah (y: -0.05)
+    _purplePosition = Tween(begin: -0.5, end: -0.05).animate(
       CurvedAnimation(
         parent: _circleController,
-        curve: const Interval(0.0, 0.75, curve: Curves.easeInOutCubic),
+        curve: const Interval(0.0, 0.7, curve: Curves.easeInOutCubic),
       ),
     );
 
-    _greenPosition = Tween(begin: 0.65, end: 0.05).animate(
+    // Bulatan hijau: dari bawah (y: 0.5) ke tengah (y: 0.05)
+    _greenPosition = Tween(begin: 0.5, end: 0.05).animate(
       CurvedAnimation(
         parent: _circleController,
-        curve: const Interval(0.0, 0.75, curve: Curves.easeInOutCubic),
+        curve: const Interval(0.0, 0.7, curve: Curves.easeInOutCubic),
       ),
     );
 
-    _circleSize = Tween(begin: 130.0, end: 0.0).animate(
+    _circleSize = Tween(begin: 150.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _circleController,
-        curve: const Interval(0.75, 1.0, curve: Curves.easeInOut),
+        curve: const Interval(0.7, 1.0, curve: Curves.easeInOutQuad),
       ),
     );
 
-    _logoScale = Tween(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOutExpo),
+    _logoScale = Tween(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeOutCubic),
     );
 
     _logoOpacity = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _logoController,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
+        curve: const Interval(0.0, 0.7, curve: Curves.easeInOutQuad),
       ),
     );
 
@@ -104,31 +104,34 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   Future<void> _startSequence() async {
-    /// 1️⃣ Circle masuk pelan
+    // 1️⃣ Circle masuk smooth
     await _circleController.forward();
 
-    /// 2️⃣ Logo pertama muncul
+    // 2️⃣ Logo pertama muncul
     await _logoController.forward();
 
-    /// 3️⃣ Diam sebentar (branding moment)
-    await Future.delayed(const Duration(milliseconds: 1000));
+    // 3️⃣ Branding moment dengan logo pertama
+    await Future.delayed(const Duration(milliseconds: 800));
 
-    /// 4️⃣ Background mulai berubah pelan
-    _backgroundController.forward();
-
-    /// 5️⃣ Tunggu lagi sebelum ganti logo
-    await Future.delayed(const Duration(milliseconds: 1200));
-
+    // 4️⃣ Ganti ke text logo (Logo 2)
     if (mounted) {
       setState(() => _showTextLogo = true);
     }
+
+    // 5️⃣ Tunggu transisi logo selesai
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    // 6️⃣ Background gradient mulai muncul (bersamaan dengan Logo 2)
+    _backgroundController.forward();
+
+    // 7️⃣ Tunggu gradient selesai
+    await Future.delayed(const Duration(milliseconds: 2500));
 
     _checkLogin();
   }
 
   Future<void> _checkLogin() async {
-    /// Splash total ≈ 6–7 detik (sengaja biar elegan)
-    await Future.delayed(const Duration(milliseconds: 3000));
+    await Future.delayed(const Duration(milliseconds: 1500));
 
     final prefs = await SharedPreferences.getInstance();
     final isSetup = prefs.getBool('isSetupComplete') ?? false;
@@ -216,11 +219,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     return Stack(
       children: [
+        // Bulatan ungu dari atas
         Positioned(
           left: size.width / 2 - circle / 2,
           top: size.height * (0.5 + _purplePosition.value) - circle / 2,
           child: _circle(circle, const Color(0xFF7B68EE)),
         ),
+        // Bulatan hijau dari bawah
         Positioned(
           left: size.width / 2 - circle / 2,
           top: size.height * (0.5 + _greenPosition.value) - circle / 2,
@@ -239,9 +244,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
         color: color,
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.6),
-            blurRadius: 50,
-            spreadRadius: 20,
+            color: color.withOpacity(0.5),
+            blurRadius: 40,
+            spreadRadius: 15,
           ),
         ],
       ),
@@ -258,9 +263,9 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
             width: logoSize,
             height: logoSize,
             child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 1000),
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
+              duration: const Duration(milliseconds: 1200),
+              switchInCurve: Curves.easeInOutCubic,
+              switchOutCurve: Curves.easeInOutCubic,
               child: !_showTextLogo
                   ? SvgPicture.asset(
                       'assets/images/Logo_1.svg',
