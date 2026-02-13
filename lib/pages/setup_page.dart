@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'register_page.dart';
 import 'login_page.dart';
@@ -114,8 +115,8 @@ class _SetupPageState extends State<SetupPage> {
                 child: Column(
                   children: [
                     // GIF Illustration
-                    Image.asset(
-                      'assets/images/burnice-burnice-go.gif',
+                    SvgPicture.asset(
+                      'assets/images/onboarding_1.svg',
                       width: 200,
                       height: 200,
                       fit: BoxFit.contain,
