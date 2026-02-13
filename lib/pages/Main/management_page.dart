@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './SubPages/category_pages.dart';
 import './SubPages/product_page.dart';
+import './SubPages/import_excel_page.dart'; // ← NEW IMPORT
 
 class ManagementPage extends StatelessWidget {
   const ManagementPage({super.key});
@@ -17,10 +18,7 @@ class ManagementPage extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            color.withOpacity(0.8),
-            color,
-          ],
+          colors: [color.withOpacity(0.8), color],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -48,11 +46,7 @@ class ManagementPage extends StatelessWidget {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 36,
-                    color: Colors.white,
-                  ),
+                  child: Icon(icon, size: 36, color: Colors.white),
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -103,10 +97,7 @@ class ManagementPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.grey[50]!,
-            Colors.grey[100]!,
-          ],
+          colors: [Colors.grey[50]!, Colors.grey[100]!],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -114,7 +105,7 @@ class ManagementPage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          // Header Section
+          // Header Section (tidak diubah)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
@@ -131,18 +122,15 @@ class ManagementPage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Kelola data produk dan kategori',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
-          // Menu Cards
+
+          // Menu Cards (tidak diubah)
           _menuCard(
             context: context,
             title: 'Kategori Produk',
@@ -156,7 +144,7 @@ class ManagementPage extends StatelessWidget {
               );
             },
           ),
-          
+
           _menuCard(
             context: context,
             title: 'Produk',
@@ -171,17 +159,30 @@ class ManagementPage extends StatelessWidget {
             },
           ),
 
-          // Info Card
+          // ── NEW CARD: Import Excel ──────────────────
+          _menuCard(
+            context: context,
+            title: 'Import Excel',
+            subtitle: 'Import produk & kategori dari file',
+            icon: Icons.upload_file_rounded,
+            color: const Color(0xFF43A047),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ImportExcelPage()),
+              );
+            },
+          ),
+          // ───────────────────────────────────────────
+
+          // Info Card (tidak diubah)
           Container(
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.blue[50],
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.blue[200]!,
-                width: 1,
-              ),
+              border: Border.all(color: Colors.blue[200]!, width: 1),
             ),
             child: Row(
               children: [
@@ -194,10 +195,7 @@ class ManagementPage extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Pilih menu untuk mulai mengelola data',
-                    style: TextStyle(
-                      color: Colors.blue[900],
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.blue[900], fontSize: 14),
                   ),
                 ),
               ],
