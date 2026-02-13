@@ -10,36 +10,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clone repo
+      # Checkout repo
       - uses: actions/checkout@v4
 
-      # 2️⃣ Setup Java (WAJIB untuk Android)
+      # Setup Java 17
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: 17
+          cache: gradle
 
-     
+      # Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-         flutter-version: '3.38.5'
-         cache: true
+          flutter-version: 3.38.5
+          cache: true
 
-      
-      - name: Flutter Doctor
-        run: flutter doctor -v
+      # Accept licenses & install SDK 36
+      - name: Setup Android SDK 36
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-36"
 
-      
+      # Get packages
       - name: Install Dependencies
         run: flutter pub get
 
-      
+      # Clean project (hindari watcher error)
+      - name: Flutter Clean
+        run: flutter clean
+
+      # Build APK
       - name: Build APK Release
         run: flutter build apk --release
 
-     
+      # Upload APK
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
