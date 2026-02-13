@@ -10,10 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
       - uses: actions/checkout@v4
 
-      # Setup Java 17
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -21,33 +19,30 @@ jobs:
           java-version: 17
           cache: gradle
 
-      # Setup Flutter
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.38.5
           cache: true
 
-      # Accept licenses & install SDK 36
-      - name: Setup Android SDK 36
+      - name: Install Android SDK 36
         run: |
           yes | sdkmanager --licenses
           sdkmanager "platforms;android-36"
 
-      # Get packages
       - name: Install Dependencies
         run: flutter pub get
 
-      # Clean project (hindari watcher error)
       - name: Flutter Clean
         run: flutter clean
 
-      # Build APK
       - name: Build APK Release
         run: flutter build apk --release
 
-      # Upload APK
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: waroengku-release-apk
