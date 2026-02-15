@@ -1,18 +1,20 @@
 import '../db/database_helper.dart';
 
-
 class TransactionService {
   final dbHelper = DatabaseHelper.instance;
 
-  Future<void> saveTransaction(
+  Future<int> saveTransaction(
+    // ← void → int
     int total,
     List<CartItemData> items,
   ) async {
     final db = await dbHelper.database;
 
+    int trxId = 0;
+
     await db.transaction((txn) async {
       // 1️⃣ Insert transaksi
-      final trxId = await txn.insert('transactions', {
+      trxId = await txn.insert('transactions', {
         'total': total,
         'created_at': DateTime.now().toIso8601String(),
       });
@@ -32,6 +34,8 @@ class TransactionService {
         );
       }
     });
+
+    return trxId; // ← tambahan
   }
 }
 

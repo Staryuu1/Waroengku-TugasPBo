@@ -7,6 +7,7 @@ import 'login_page.dart';
 import './Main/management_page.dart';
 import './Main/pos_page.dart';
 import 'Main/reports_pages.dart';
+import './Main/SubPages/settings_page.dart'; // ← NEW
 
 class MainPage extends StatefulWidget {
   final User user;
@@ -63,7 +64,6 @@ class _MainPageState extends State<MainPage> {
 
       await _backupService.restoreDatabaseFromPath(file.path);
 
-      // After restore, force logout so user can login to restored DB
       await AuthService().logout();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -128,11 +128,10 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Definisikan warna untuk setiap tab
     final List<Color> tabColors = [
-      const Color(0xFF6C63FF), // Management - Purple
-      const Color(0xFF4CAF50), // Cashier - Green
-      const Color(0xFFFF6584), // Reports - Pink
+      const Color(0xFF6C63FF),
+      const Color(0xFF4CAF50),
+      const Color(0xFFFF6584),
     ];
 
     return Scaffold(
@@ -205,7 +204,13 @@ class _MainPageState extends State<MainPage> {
             color: Colors.white,
             icon: const Icon(Icons.more_vert, color: Colors.white),
             onSelected: (value) {
-              if (value == 'backup') {
+              if (value == 'settings') {
+                // ← NEW
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                );
+              } else if (value == 'backup') {
                 _backupData();
               } else if (value == 'restore') {
                 _restoreData();
@@ -214,12 +219,47 @@ class _MainPageState extends State<MainPage> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'backup', child: Text('Backup Data')),
+              // ← NEW
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings_rounded, size: 20, color: Colors.grey),
+                    SizedBox(width: 12),
+                    Text('Pengaturan'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'backup',
+                child: Row(
+                  children: [
+                    Icon(Icons.backup_rounded, size: 20, color: Colors.grey),
+                    SizedBox(width: 12),
+                    Text('Backup Data'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'restore',
-                child: Text('Restore Data'),
+                child: Row(
+                  children: [
+                    Icon(Icons.restore_rounded, size: 20, color: Colors.grey),
+                    SizedBox(width: 12),
+                    Text('Restore Data'),
+                  ],
+                ),
               ),
-              const PopupMenuItem(value: 'logout', child: Text('Logout')),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout_rounded, size: 20, color: Colors.orange),
+                    SizedBox(width: 12),
+                    Text('Logout', style: TextStyle(color: Colors.orange)),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(width: 8),

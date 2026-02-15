@@ -7,7 +7,7 @@ import '../../models/category.dart';
 import '../../services/product_service.dart';
 import '../../services/category_service.dart';
 import '../../services/transaction_service.dart';
-import '../../services/receipt_service.dart';
+import '../../services/printer_service.dart'; // ← NEW
 
 /// =======================
 /// CART ITEM
@@ -35,6 +35,7 @@ class _POSPageState extends State<POSPage> {
   final ProductService _productService = ProductService();
   final CategoryService _categoryService = CategoryService();
   final TransactionService _transactionService = TransactionService();
+  final PrinterService _printerService = PrinterService.instance; // ← NEW
 
   List<Product> _products = [];
   List<Category> _categories = [];
@@ -104,25 +105,8 @@ class _POSPageState extends State<POSPage> {
     );
   }
 
-  Future<void> _receipt_export({required int paid, required int change}) async {
-    await ReceiptService.previewReceipt(
-      total: _total,
-      paid: paid,
-      change: change,
-      items: _cart
-          .map(
-            (e) => ReceiptItem(
-              name: e.product.name,
-              price: e.product.price,
-              qty: e.qty,
-            ),
-          )
-          .toList(),
-    );
-  }
-
   /// =======================
-  /// PAYMENT + CHANGE UI
+  /// PAYMENT + PRINT      ← UPDATED
   /// =======================
   void _pay() {
     final payCtrl = TextEditingController();
@@ -227,6 +211,7 @@ class _POSPageState extends State<POSPage> {
               onPressed: change < 0
                   ? null
                   : () async {
+                      // ── Simpan transaksi ──
                       final items = _cart
                           .map(
                             (e) => CartItemData(
@@ -237,21 +222,55 @@ class _POSPageState extends State<POSPage> {
                           )
                           .toList();
 
-                      await _transactionService.saveTransaction(_total, items);
+                      final transactionId = await _transactionService
+                          .saveTransaction(_total, items);
 
                       Navigator.pop(context);
+
+                      // ── Snapshot cart sebelum di-clear ──
+                      final receiptItems = _cart
+                          .map(
+                            (e) => ReceiptItem(
+                              name: e.product.name,
+                              price: e.product.price,
+                              qty: e.qty,
+                            ),
+                          )
+                          .toList();
+                      final receiptTotal = _total;
+                      final receiptPaid = paid;
+                      final receiptChange = change;
+
                       setState(() => _cart.clear());
                       await _loadProducts();
-                      // await _receipt_export(
-                      //   paid: paid,
-                      //   change: change,
-                      // );
+
+                      // ── Print receipt otomatis ──
+                      final printResult = await _printerService.printReceipt(
+                        transactionId: transactionId,
+                        items: receiptItems,
+                        total: receiptTotal,
+                        paid: receiptPaid,
+                        change: receiptChange,
+                      );
+
+                      if (!mounted) return;
+
+                      String message =
+                          'Transaksi berhasil • Kembalian Rp ${_format(receiptChange)}';
+
+                      if (printResult == PrintResult.notConnected) {
+                        message += '\n⚠️ Printer tidak terhubung';
+                      } else if (printResult == PrintResult.error) {
+                        message += '\n⚠️ Gagal print receipt';
+                      }
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            'Transaksi berhasil • Kembalian Rp ${_format(change)}',
-                          ),
-                          backgroundColor: Colors.green,
+                          content: Text(message),
+                          backgroundColor: printResult == PrintResult.success
+                              ? Colors.green
+                              : Colors.orange,
+                          duration: const Duration(seconds: 3),
                         ),
                       );
                     },
@@ -316,16 +335,12 @@ class _POSPageState extends State<POSPage> {
           ),
           body: Stack(
             children: [
-              /// =======================
-              /// CAMERA
-              /// =======================
               MobileScanner(
                 controller: controller,
                 onDetect: (capture) async {
                   final code = capture.barcodes.first.rawValue;
                   if (code == null) return;
 
-                  // ⛔ STOP CAMERA DULU
                   await controller.stop();
 
                   final product = await _productService.getByBarcode(code);
@@ -346,10 +361,6 @@ class _POSPageState extends State<POSPage> {
                   _addToCart(product);
                 },
               ),
-
-              /// =======================
-              /// FRAME SCAN
-              /// =======================
               Center(
                 child: Container(
                   width: 260,
@@ -363,10 +374,6 @@ class _POSPageState extends State<POSPage> {
                   ),
                 ),
               ),
-
-              /// =======================
-              /// TEXT BAWAH
-              /// =======================
               Positioned(
                 bottom: 40,
                 left: 0,
@@ -393,19 +400,17 @@ class _POSPageState extends State<POSPage> {
         ),
       ),
     ).then((_) {
-      // 🧹 CLEANUP
       controller.dispose();
     });
   }
 
   /// =======================
-  /// UI
+  /// UI (tidak ada perubahan)
   /// =======================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-
       body: Column(
         children: [
           /// FILTER KATEGORI & SCAN BARCODE

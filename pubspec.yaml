@@ -47,6 +47,8 @@ dependencies:
   excel: ^4.0.6
   file_picker: ^8.0.7 # ← downgrade agar kompatibel dengan share_plus ^8.0.0
   cupertino_icons: ^1.0.8
+  print_bluetooth_thermal: ^1.1.9
+  esc_pos_utils_plus: ^2.0.3
 
 dev_dependencies:
   flutter_test:
