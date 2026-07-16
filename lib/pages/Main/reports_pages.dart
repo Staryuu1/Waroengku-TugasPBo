@@ -493,57 +493,66 @@ class _ReportsPageState extends State<ReportsPage> {
                             padding: EdgeInsets.all(32),
                             child: Center(child: Text('Tidak ada data produk')),
                           )
-                        : DataTable(
-                              headingRowColor: WidgetStateProperty.all(
-                                Theme.of(
-                                  context,
-                                ).colorScheme.surfaceContainerLow,
-                              ),
-                              columns: [
-                                DataColumn(
-                                  label: const Text(
-                                    'Produk',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                        : LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minWidth: constraints.maxWidth,
                                   ),
-                                  columnWidth: const FlexColumnWidth(2),
-                                ),
-                                DataColumn(
-                                  label: const Text(
-                                    'Qty Terjual',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  numeric: true,
-                                  columnWidth: const FixedColumnWidth(100),
-                                ),
-                                DataColumn(
-                                  label: const Text(
-                                    'Pendapatan',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  numeric: true,
-                                  columnWidth: const FixedColumnWidth(120),
-                                ),
-                              ],
-                              rows: topProducts
-                                  .map(
-                                    (e) => DataRow(
-                                      cells: [
-                                        DataCell(Text(e.productName)),
-                                        DataCell(Text(e.qtySold.toString())),
-                                        DataCell(
-                                          Text(
-                                            currency.format(e.totalRevenue),
-                                            style: const TextStyle(
-                                              color: Color(0xFF4CAF50),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                  child: DataTable(
+                                    headingRowColor: WidgetStateProperty.all(
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerLow,
                                     ),
-                                  )
-                                  .toList(),
-                            ),
+                                    columns: const [
+                                      DataColumn(
+                                        label: Text(
+                                          'Produk',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Qty Terjual',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        numeric: true,
+                                      ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Pendapatan',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        numeric: true,
+                                      ),
+                                    ],
+                                    rows: topProducts
+                                        .map(
+                                          (e) => DataRow(
+                                            cells: [
+                                              DataCell(Text(e.productName)),
+                                              DataCell(Text(e.qtySold.toString())),
+                                              DataCell(
+                                                Text(
+                                                  currency.format(e.totalRevenue),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF4CAF50),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                   const SizedBox(height: 24),
 
@@ -574,45 +583,55 @@ class _ReportsPageState extends State<ReportsPage> {
                               child: Text('Tidak ada data kategori'),
                             ),
                           )
-                        : DataTable(
-                            headingRowColor: WidgetStateProperty.all(
-                              Theme.of(context).colorScheme.surfaceContainerLow,
-                            ),
-                            columns: [
-                              DataColumn(
-                                label: const Text(
-                                  'Kategori',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                columnWidth: const FlexColumnWidth(2),
-                              ),
-                              DataColumn(
-                                label: const Text(
-                                  'Pendapatan',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                numeric: true,
-                                columnWidth: const FixedColumnWidth(120),
-                              ),
-                            ],
-                            rows: categoryReports
-                                .map(
-                                  (e) => DataRow(
-                                    cells: [
-                                      DataCell(Text(e.categoryName)),
-                                      DataCell(
-                                        Text(
-                                          currency.format(e.totalRevenue),
-                                          style: const TextStyle(
-                                            color: Color(0xFF4CAF50),
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                        : LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    minWidth: constraints.maxWidth,
+                                  ),
+                                  child: DataTable(
+                                    headingRowColor: WidgetStateProperty.all(
+                                      Theme.of(context).colorScheme.surfaceContainerLow,
+                                    ),
+                                    columns: const [
+                                      DataColumn(
+                                        label: Text(
+                                          'Kategori',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
                                         ),
                                       ),
+                                      DataColumn(
+                                        label: Text(
+                                          'Pendapatan',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        numeric: true,
+                                      ),
                                     ],
+                                    rows: categoryReports
+                                        .map(
+                                          (e) => DataRow(
+                                            cells: [
+                                              DataCell(Text(e.categoryName)),
+                                              DataCell(
+                                                Text(
+                                                  currency.format(e.totalRevenue),
+                                                  style: const TextStyle(
+                                                    color: Color(0xFF4CAF50),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                        .toList(),
                                   ),
-                                )
-                                .toList(),
+                                ),
+                              );
+                            },
                           ),
                   ),
 
@@ -640,56 +659,65 @@ class _ReportsPageState extends State<ReportsPage> {
                                 ),
                               ],
                       ),
-                      child: DataTable(
-                        headingRowColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.surfaceContainerLow,
-                        ),
-                        columns: [
-                          DataColumn(
-                            label: const Text(
-                              'Tanggal',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            columnWidth: const FlexColumnWidth(2),
-                          ),
-                          DataColumn(
-                            label: const Text(
-                              'Transaksi',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            numeric: true,
-                            columnWidth: const FixedColumnWidth(100),
-                          ),
-                          DataColumn(
-                            label: const Text(
-                              'Revenue',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            numeric: true,
-                            columnWidth: const FixedColumnWidth(120),
-                          ),
-                        ],
-                        rows: salesByDate
-                            .map(
-                              (e) => DataRow(
-                                cells: [
-                                  DataCell(Text(dateFormat.format(e.date))),
-                                  DataCell(
-                                    Text(e.transactionCount.toString()),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      currency.format(e.totalRevenue),
-                                      style: const TextStyle(
-                                        color: Color(0xFF4CAF50),
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: constraints.maxWidth,
+                              ),
+                              child: DataTable(
+                                headingRowColor: WidgetStateProperty.all(
+                                  Theme.of(context).colorScheme.surfaceContainerLow,
+                                ),
+                                columns: const [
+                                  DataColumn(
+                                    label: Text(
+                                      'Tanggal',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Transaksi',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    numeric: true,
+                                  ),
+                                  DataColumn(
+                                    label: Text(
+                                      'Revenue',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    numeric: true,
+                                  ),
                                 ],
+                                rows: salesByDate
+                                    .map(
+                                      (e) => DataRow(
+                                        cells: [
+                                          DataCell(Text(dateFormat.format(e.date))),
+                                          DataCell(
+                                            Text(e.transactionCount.toString()),
+                                          ),
+                                          DataCell(
+                                            Text(
+                                              currency.format(e.totalRevenue),
+                                              style: const TextStyle(
+                                                color: Color(0xFF4CAF50),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    .toList(),
                               ),
-                            )
-                            .toList(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 24),

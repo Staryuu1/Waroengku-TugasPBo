@@ -169,13 +169,13 @@ class _ProductPageState extends State<ProductPage> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                    : Theme.of(context).colorScheme.primaryContainer,
+                    ? const Color(0xFFFF6584).withOpacity(0.2)
+                    : const Color(0xFFFF6584).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 product == null ? Icons.add_shopping_cart : Icons.edit,
-                color: Theme.of(context).colorScheme.primary,
+                color: const Color(0xFFFF6584),
               ),
             ),
             const SizedBox(width: 12),
@@ -241,7 +241,7 @@ class _ProductPageState extends State<ProductPage> {
                 decoration: InputDecoration(
                   labelText: 'Barcode',
                   prefixIcon: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner),
+                    icon: const Icon(Icons.qr_code_scanner, color: Color(0xFFFF6584)),
                     onPressed: () {
                       _scanBarcode(barcodeCtrl);
                     },
@@ -259,7 +259,7 @@ class _ProductPageState extends State<ProductPage> {
                 controller: nameCtrl,
                 decoration: InputDecoration(
                   labelText: 'Nama Produk',
-                  prefixIcon: const Icon(Icons.shopping_bag_outlined),
+                  prefixIcon: const Icon(Icons.shopping_bag_outlined, color: Color(0xFFFF6584)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -274,7 +274,7 @@ class _ProductPageState extends State<ProductPage> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Harga',
-                  prefixIcon: const Icon(Icons.money),
+                  prefixIcon: const Icon(Icons.money, color: Color(0xFFFF6584)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -289,7 +289,7 @@ class _ProductPageState extends State<ProductPage> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Stok',
-                  prefixIcon: const Icon(Icons.inventory_outlined),
+                  prefixIcon: const Icon(Icons.inventory_outlined, color: Color(0xFFFF6584)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -303,7 +303,7 @@ class _ProductPageState extends State<ProductPage> {
                 value: selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Kategori',
-                  prefixIcon: const Icon(Icons.category_outlined),
+                  prefixIcon: const Icon(Icons.category_outlined, color: Color(0xFFFF6584)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -424,10 +424,12 @@ class _ProductPageState extends State<ProductPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1A1A1A)
+            : const Color(0xFFFF6584),
+        title: const Text(
           'Produk',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -568,7 +570,7 @@ class _ProductPageState extends State<ProductPage> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: const Color(0xFFFF6584),
                                         ),
                                       ),
                                       const SizedBox(width: 16),
@@ -597,12 +599,12 @@ class _ProductPageState extends State<ProductPage> {
                                 IconButton(
                                   icon: const Icon(
                                     Icons.edit_outlined,
-                                    color: Color(0xFF6C63FF),
+                                    color: Color(0xFFFF6584),
                                   ),
                                   onPressed: () => _showForm(product: p),
                                   style: IconButton.styleFrom(
                                     backgroundColor: const Color(
-                                      0xFF6C63FF,
+                                      0xFFFF6584,
                                     ).withOpacity(0.1),
                                   ),
                                 ),

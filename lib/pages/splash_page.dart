@@ -8,6 +8,7 @@ import '../models/user.dart';
 import 'login_page.dart';
 import 'main_page.dart';
 import 'setup_page.dart';
+import '../db/database_helper.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -134,10 +135,21 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     await Future.delayed(const Duration(milliseconds: 1500));
 
     final prefs = await SharedPreferences.getInstance();
+
     final isSetup = prefs.getBool('isSetupComplete') ?? false;
 
-    if (!mounted) return;
+    //cek apakah ada table user di database
+    final dbHelper = DatabaseHelper.instance;
+    final isUserTableEmpty = await dbHelper.isUserTableEmpty();
 
+    if (!mounted) return;
+    if (!isUserTableEmpty) {
+      prefs.setBool('isSetupComplete', true);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+    }
     if (!isSetup) {
       Navigator.pushReplacement(
         context,

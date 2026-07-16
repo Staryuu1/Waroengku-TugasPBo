@@ -43,15 +43,15 @@ class _CategoryPageState extends State<CategoryPage> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                    : Theme.of(context).colorScheme.primaryContainer,
+                    ? const Color(0xFF6C63FF).withOpacity(0.2)
+                    : const Color(0xFF6C63FF).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 category == null
                     ? Icons.add_circle_outline
                     : Icons.edit_outlined,
-                color: Theme.of(context).colorScheme.primary,
+                color: const Color(0xFF6C63FF),
               ),
             ),
             const SizedBox(width: 12),
@@ -72,12 +72,14 @@ class _CategoryPageState extends State<CategoryPage> {
                 decoration: InputDecoration(
                   labelText: 'Nama Kategori',
                   hintText: 'Masukkan nama kategori',
-                  prefixIcon: const Icon(Icons.category_outlined),
+                  prefixIcon: const Icon(Icons.category_outlined, color: Color(0xFF6C63FF)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -127,7 +129,7 @@ class _CategoryPageState extends State<CategoryPage> {
               _loadCategories();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: const Color(0xFF6C63FF),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -151,7 +153,11 @@ class _CategoryPageState extends State<CategoryPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error, size: 28),
+            Icon(
+              Icons.warning_amber_rounded,
+              color: Theme.of(context).colorScheme.error,
+              size: 28,
+            ),
             SizedBox(width: 12),
             Text('Konfirmasi Hapus'),
           ],
@@ -202,16 +208,18 @@ class _CategoryPageState extends State<CategoryPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        title: Text(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1A1A1A)
+            : const Color(0xFF6C63FF),
+        title: const Text(
           'Kategori Produk',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showForm(),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: const Color(0xFF6C63FF),
         icon: const Icon(Icons.add),
         label: const Text('Tambah Kategori'),
       ),
@@ -239,7 +247,10 @@ class _CategoryPageState extends State<CategoryPage> {
                   const SizedBox(height: 8),
                   Text(
                     'Tap tombol + untuk menambah kategori',
-                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -288,7 +299,9 @@ class _CategoryPageState extends State<CategoryPage> {
                         ),
                         child: Icon(
                           Icons.folder_special,
-                          color: isDark ? const Color(0xFF6C63FF) : Colors.white,
+                          color: isDark
+                              ? const Color(0xFF6C63FF)
+                              : Colors.white,
                           size: 32,
                         ),
                       ),
@@ -310,7 +323,9 @@ class _CategoryPageState extends State<CategoryPage> {
                             Text(
                               '${_categories.length}',
                               style: TextStyle(
-                                color: isDark ? const Color(0xFF6C63FF) : Colors.white,
+                                color: isDark
+                                    ? const Color(0xFF6C63FF)
+                                    : Colors.white,
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -355,16 +370,20 @@ class _CategoryPageState extends State<CategoryPage> {
                                   Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).brightness == Brightness.dark
-                                          ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                                          : Theme.of(context).colorScheme.primaryContainer,
+                                      color:
+                                          Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? const Color(0xFF6C63FF)
+                                                .withOpacity(0.2)
+                                          : const Color(0xFF6C63FF)
+                                                .withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Icon(
-                                      Icons.label,
-                                      color: Theme.of(context).colorScheme.primary,
-                                      size: 24,
-                                    ),
+                                      child: const Icon(
+                                        Icons.label,
+                                        color: Color(0xFF6C63FF),
+                                        size: 24,
+                                      ),
                                   ),
                                   const SizedBox(width: 16),
 
@@ -386,7 +405,9 @@ class _CategoryPageState extends State<CategoryPage> {
                                           'ID: ${c.id}',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                       ],
@@ -398,29 +419,42 @@ class _CategoryPageState extends State<CategoryPage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: Icon(
+                                        icon: const Icon(
                                           Icons.edit_outlined,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Color(0xFF6C63FF),
                                         ),
                                         onPressed: () => _showForm(category: c),
                                         style: IconButton.styleFrom(
-                                          backgroundColor: Theme.of(context).brightness == Brightness.dark
-                                              ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                                              : Theme.of(context).colorScheme.primaryContainer,
+                                          backgroundColor:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? const Color(0xFF6C63FF)
+                                                    .withOpacity(0.2)
+                                              : const Color(0xFF6C63FF)
+                                                    .withOpacity(0.1),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       IconButton(
                                         icon: Icon(
                                           Icons.delete_outline,
-                                          color: Theme.of(context).colorScheme.error,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.error,
                                         ),
                                         onPressed: () =>
                                             _showDeleteConfirmation(c),
                                         style: IconButton.styleFrom(
-                                          backgroundColor: Theme.of(context).brightness == Brightness.dark
-                                              ? Theme.of(context).colorScheme.error.withOpacity(0.2)
-                                              : Theme.of(context).colorScheme.errorContainer,
+                                          backgroundColor:
+                                              Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Theme.of(context)
+                                                    .colorScheme
+                                                    .error
+                                                    .withOpacity(0.2)
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.errorContainer,
                                         ),
                                       ),
                                     ],

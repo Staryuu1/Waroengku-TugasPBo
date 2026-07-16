@@ -111,7 +111,7 @@ class _POSPageState extends State<POSPage> {
   void _pay() {
     final payCtrl = TextEditingController();
     int paid = 0;
-    int change = 0;
+    int change = -_total;
 
     showDialog(
       context: context,

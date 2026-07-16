@@ -5,6 +5,7 @@ import 'register_page.dart';
 import 'login_page.dart';
 import '../services/backup_service.dart';
 import 'package:file_selector/file_selector.dart';
+import '../db/database_helper.dart';
 
 class SetupPage extends StatefulWidget {
   const SetupPage({super.key});
@@ -39,10 +40,17 @@ class _SetupPageState extends State<SetupPage> {
     if (result == true) {
       await _setSetupCompleteAndGoToLogin();
     } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registrasi tidak selesai')),
-        );
+      //cek apakah ada table user di database
+      final dbHelper = DatabaseHelper.instance;
+      final isUserTableEmpty = await dbHelper.isUserTableEmpty();
+      if (isUserTableEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registrasi tidak selesai')),
+          );
+        }
+      } else {
+        await _setSetupCompleteAndGoToLogin();
       }
     }
   }

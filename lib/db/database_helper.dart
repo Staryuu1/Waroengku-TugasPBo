@@ -75,6 +75,13 @@ class DatabaseHelper {
     return await db.insert('users', user.toMap());
   }
 
+  //check jika table user kosong
+  Future<bool> isUserTableEmpty() async {
+    final db = await database;
+    final result = await db.query('users', limit: 1);
+    return result.isEmpty; // true jika kosong, false jika ada data
+  }
+
   // Check Login
   Future<User?> login(String username, String password) async {
     final db = await database;
