@@ -502,6 +502,8 @@ class _ReportsPageState extends State<ReportsPage> {
                                     minWidth: constraints.maxWidth,
                                   ),
                                   child: DataTable(
+                                    columnSpacing: 16,
+                                    horizontalMargin: 12,
                                     headingRowColor: WidgetStateProperty.all(
                                       Theme.of(
                                         context,
@@ -592,6 +594,8 @@ class _ReportsPageState extends State<ReportsPage> {
                                     minWidth: constraints.maxWidth,
                                   ),
                                   child: DataTable(
+                                    columnSpacing: 16,
+                                    horizontalMargin: 12,
                                     headingRowColor: WidgetStateProperty.all(
                                       Theme.of(context).colorScheme.surfaceContainerLow,
                                     ),
@@ -668,6 +672,8 @@ class _ReportsPageState extends State<ReportsPage> {
                                 minWidth: constraints.maxWidth,
                               ),
                               child: DataTable(
+                                columnSpacing: 16,
+                                horizontalMargin: 12,
                                 headingRowColor: WidgetStateProperty.all(
                                   Theme.of(context).colorScheme.surfaceContainerLow,
                                 ),
