@@ -3,6 +3,8 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../db/database_helper.dart';
+
 class BackupService {
   Future<String> _getDatabasePath() async {
     return join(await getDatabasesPath(), 'waroengku.db');
@@ -41,6 +43,8 @@ class BackupService {
   /// Restore database dari path tertentu
   Future<void> restoreDatabaseFromPath(String sourcePath) async {
     final dbPath = await _getDatabasePath();
+
+    await DatabaseHelper.instance.closeDatabase();
 
     try {
       await deleteDatabase(dbPath);

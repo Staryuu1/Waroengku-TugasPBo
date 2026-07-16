@@ -144,7 +144,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
     if (!mounted) return;
     if (!isUserTableEmpty) {
-      prefs.setBool('isSetupComplete', true);
+      await prefs.setBool('isSetupComplete', true);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),

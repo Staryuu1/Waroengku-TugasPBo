@@ -8,8 +8,20 @@ class DatabaseHelper {
 
   DatabaseHelper._();
 
+  Future<void> closeDatabase() async {
+    final db = _database;
+    _database = null;
+    if (db != null && db.isOpen) {
+      await db.close();
+    }
+  }
+
   Future<Database> get database async {
-    if (_database != null) return _database!;
+    if (_database != null) {
+      if (_database!.isOpen) return _database!;
+      _database = null;
+    }
+
     _database = await initDB();
     return _database!;
   }

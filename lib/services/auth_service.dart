@@ -15,22 +15,20 @@ class AuthService {
       await prefs.setInt('userId', user.id!);
       await prefs.setString('username', user.username);
     }
-   
+
     return user;
   }
 
   // REGISTER
   Future<bool> register(String username, String password) async {
     try {
-      await _db.insertUser(
-        User(username: username, password: password),
-      );
+      await _db.insertUser(User(username: username, password: password));
       return true;
-    } catch (_) {
+    } catch (err) {
       return false;
     }
   }
-  
+
   Future<User?> getLoggedInUser() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -42,11 +40,7 @@ class AuthService {
 
     if (userId == null || username == null) return null;
 
-    return User(
-      id: userId,
-      username: username,
-      password: '',
-    );
+    return User(id: userId, username: username, password: '');
   }
 
   // CEK SESSION
