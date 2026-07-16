@@ -118,13 +118,15 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Import Excel',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF43A047),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1A1A1A)
+            : const Color(0xFF43A047),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
@@ -198,7 +200,9 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.blue.withOpacity(0.1)
+                : Colors.blue[50],
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -208,7 +212,9 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
                 'Format template:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.blue[300]
+                      : Colors.blue[800],
                   fontSize: 13,
                 ),
               ),
@@ -270,9 +276,15 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.green[50],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.green.withOpacity(0.1)
+                  : Colors.green[50],
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.green[300]!),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.green.withOpacity(0.3)
+                    : Colors.green[300]!,
+              ),
             ),
             child: Row(
               children: [
@@ -286,7 +298,9 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
                   child: Text(
                     _selectedFileName!,
                     style: TextStyle(
-                      color: Colors.green[800],
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.green[300]
+                          : Colors.green[800],
                       fontWeight: FontWeight.w500,
                       fontSize: 13,
                     ),
@@ -328,6 +342,7 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
   }
 
   Widget _buildImportSection() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bool canImport =
         _selectedFilePath != null &&
         _state != _PageState.importing &&
@@ -368,8 +383,11 @@ class _ImportExcelPageState extends State<ImportExcelPage> {
               backgroundColor: const Color(0xFF43A047),
               foregroundColor: Colors.white,
               disabledBackgroundColor: _state == _PageState.done
-                  ? Colors.green[200]
-                  : Colors.grey[300],
+                  ? (isDark ? Colors.green.withOpacity(0.3) : Colors.green[200])
+                  : (isDark ? Colors.grey[800] : Colors.grey[300]),
+              disabledForegroundColor: _state == _PageState.done
+                  ? (isDark ? Colors.green[300] : Colors.green[800])
+                  : (isDark ? Colors.grey[400] : Colors.grey[600]),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -420,17 +438,23 @@ class _StepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.08))
+            : null,
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -515,7 +539,12 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.blue[300]
+                    : Colors.blue[700],
+              ),
             ),
           ),
         ],
@@ -531,12 +560,13 @@ class _ErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red[50],
+        color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red[300]!),
+        border: Border.all(color: isDark ? Colors.red.withOpacity(0.3) : Colors.red[300]!),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,13 +581,16 @@ class _ErrorCard extends StatelessWidget {
                   'Terjadi Kesalahan',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.red[800],
+                    color: isDark ? Colors.red[300] : Colors.red[800],
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   message,
-                  style: TextStyle(fontSize: 13, color: Colors.red[700]),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.red[200] : Colors.red[700],
+                  ),
                 ),
               ],
             ),
@@ -576,12 +609,13 @@ class _ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green[50],
+        color: isDark ? Colors.green.withOpacity(0.1) : Colors.green[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green[300]!),
+        border: Border.all(color: isDark ? Colors.green.withOpacity(0.3) : Colors.green[300]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -598,7 +632,7 @@ class _ResultCard extends StatelessWidget {
                 'Import Selesai!',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.green[800],
+                  color: isDark ? Colors.green[300] : Colors.green[800],
                   fontSize: 16,
                 ),
               ),
@@ -609,14 +643,14 @@ class _ResultCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF2A2A2A) : Colors.white,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               summary.fullSummary,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.grey[800],
+                color: isDark ? Colors.grey[300] : Colors.grey[800],
                 height: 1.6,
               ),
             ),

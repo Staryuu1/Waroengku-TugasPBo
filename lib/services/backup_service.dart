@@ -17,13 +17,13 @@ class BackupService {
       throw Exception('Database file not found');
     }
 
-    // 📁 Ambil Documents folder
+    //  Ambil Documents folder
     final dir = await getExternalStorageDirectory();
     if (dir == null) {
       throw Exception('External storage not available');
     }
 
-    // 🔥 Ubah path ke Documents
+    //  Ubah path ke Documents
     final documentsPath = '/storage/emulated/0/Documents/WaroengKu';
     final backupDir = Directory(documentsPath);
 

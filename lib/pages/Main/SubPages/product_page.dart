@@ -39,8 +39,6 @@ class _ProductPageState extends State<ProductPage> {
     setState(() => _isLoading = false);
   }
 
-  
-
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -57,7 +55,6 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
-  
   String _getCategoryName(int categoryId) {
     final category = _categories.firstWhere(
       (c) => c.id == categoryId,
@@ -133,10 +130,7 @@ class _ProductPageState extends State<ProductPage> {
                     ),
                     child: const Text(
                       'Arahkan kamera ke barcode',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                 ),
@@ -151,14 +145,15 @@ class _ProductPageState extends State<ProductPage> {
     });
   }
 
-
-
   void _showForm({Product? product}) {
     final nameCtrl = TextEditingController(text: product?.name ?? '');
-    final priceCtrl = TextEditingController(text: product?.price.toString() ?? '');
-    final stockCtrl = TextEditingController(text: product?.stock.toString() ?? '');
+    final priceCtrl = TextEditingController(
+      text: product?.price.toString() ?? '',
+    );
+    final stockCtrl = TextEditingController(
+      text: product?.stock.toString() ?? '',
+    );
     final barcodeCtrl = TextEditingController(text: product?.barcode ?? '');
-
 
     int? selectedCategory = product?.categoryId;
 
@@ -173,12 +168,14 @@ class _ProductPageState extends State<ProductPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF6584).withOpacity(0.1),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                    : Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 product == null ? Icons.add_shopping_cart : Icons.edit,
-                color: const Color(0xFFFF6584),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(width: 12),
@@ -199,63 +196,61 @@ class _ProductPageState extends State<ProductPage> {
                   height: 180,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).colorScheme.surfaceContainerLow,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey[300]!, width: 2),
+                    border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 2),
                   ),
                   child: _imageFile != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(14),
+                          child: Image.file(_imageFile!, fit: BoxFit.cover),
+                        )
+                      : product?.imagePath != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
                           child: Image.file(
-                            _imageFile!,
+                            File(product!.imagePath!),
                             fit: BoxFit.cover,
                           ),
                         )
-                      : product?.imagePath != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: Image.file(
-                                File(product!.imagePath!),
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_photo_alternate_outlined,
-                                  size: 50,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Tap untuk pilih gambar',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate_outlined,
+                              size: 50,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Tap untuk pilih gambar',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
               const SizedBox(height: 20),
-              
-          
-              
+
               TextField(
                 controller: barcodeCtrl,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: 'Barcode',
-                  prefixIcon: IconButton(icon: const Icon(Icons.qr_code_scanner), onPressed: () {
-                    _scanBarcode(barcodeCtrl);
-                  },),
+                  prefixIcon: IconButton(
+                    icon: const Icon(Icons.qr_code_scanner),
+                    onPressed: () {
+                      _scanBarcode(barcodeCtrl);
+                    },
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
               ),
 
@@ -269,7 +264,7 @@ class _ProductPageState extends State<ProductPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
               ),
               const SizedBox(height: 16),
@@ -284,7 +279,7 @@ class _ProductPageState extends State<ProductPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
               ),
               const SizedBox(height: 16),
@@ -299,7 +294,7 @@ class _ProductPageState extends State<ProductPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
               ),
               const SizedBox(height: 16),
@@ -313,14 +308,11 @@ class _ProductPageState extends State<ProductPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
                 items: _categories
                     .map(
-                      (c) => DropdownMenuItem(
-                        value: c.id,
-                        child: Text(c.name),
-                      ),
+                      (c) => DropdownMenuItem(value: c.id, child: Text(c.name)),
                     )
                     .toList(),
                 onChanged: (v) => selectedCategory = v,
@@ -337,7 +329,7 @@ class _ProductPageState extends State<ProductPage> {
             child: Text(
               'Batal',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -346,7 +338,9 @@ class _ProductPageState extends State<ProductPage> {
             onPressed: () async {
               if (selectedCategory == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Pilih kategori terlebih dahulu')),
+                  const SnackBar(
+                    content: Text('Pilih kategori terlebih dahulu'),
+                  ),
                 );
                 return;
               }
@@ -427,18 +421,15 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
           'Produk',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
         ),
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showForm(),
@@ -449,196 +440,195 @@ class _ProductPageState extends State<ProductPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _products.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.inventory_2_outlined,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Belum ada produk',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Tap tombol + untuk menambah produk',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _products.length,
-                  itemBuilder: (_, i) {
-                    final p = _products[i];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () => _showForm(product: p),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                // Product Image
-                                Hero(
-                                  tag: 'product_${p.id}',
-                                  child: Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.grey[100],
+                  const SizedBox(height: 16),
+                  Text(
+                    'Belum ada produk',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tap tombol + untuk menambah produk',
+                    style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _products.length,
+              itemBuilder: (_, i) {
+                final p = _products[i];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Theme.of(context).brightness == Brightness.dark
+                        ? Border.all(color: Colors.white.withOpacity(0.08))
+                        : null,
+                    boxShadow: Theme.of(context).brightness == Brightness.dark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => _showForm(product: p),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            // Product Image
+                            Hero(
+                              tag: 'product_${p.id}',
+                              child: Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: p.imagePath != null
+                                      ? Image.file(
+                                          File(p.imagePath!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Icon(
+                                          Icons.image_not_supported,
+                                          size: 40,
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+
+                            // Product Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    p.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: p.imagePath != null
-                                          ? Image.file(
-                                              File(p.imagePath!),
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Icon(
-                                              Icons.image_not_supported,
-                                              size: 40,
-                                              color: Colors.grey[400],
-                                            ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(
+                                        0xFF6C63FF,
+                                      ).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      _getCategoryName(p.categoryId),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF6C63FF),
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 16),
-
-                                // Product Info
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  const SizedBox(height: 8),
+                                  Row(
                                     children: [
                                       Text(
-                                        p.name,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF6C63FF)
-                                              .withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          _getCategoryName(p.categoryId),
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF6C63FF),
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                        'Rp ${p.price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Rp ${p.price.toString().replaceAllMapped(
-                                                  RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                                  (Match m) => '${m[1]}.',
-                                                )}',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.green[700],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Icon(
-                                            Icons.inventory_outlined,
-                                            size: 16,
-                                            color: Colors.grey[600],
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${p.stock} pcs',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                        ],
+                                      const SizedBox(width: 16),
+                                      Icon(
+                                        Icons.inventory_outlined,
+                                        size: 16,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${p.stock} pcs',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
+                                ],
+                              ),
+                            ),
 
-                                // Action Buttons
-                                Column(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.edit_outlined,
-                                        color: Color(0xFF6C63FF),
-                                      ),
-                                      onPressed: () => _showForm(product: p),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor: const Color(0xFF6C63FF)
-                                            .withOpacity(0.1),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () =>
-                                          _showDeleteConfirmation(p),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor:
-                                            Colors.red.withOpacity(0.1),
-                                      ),
-                                    ),
-                                  ],
+                            // Action Buttons
+                            Column(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    color: Color(0xFF6C63FF),
+                                  ),
+                                  onPressed: () => _showForm(product: p),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: const Color(
+                                      0xFF6C63FF,
+                                    ).withOpacity(0.1),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                  onPressed: () => _showDeleteConfirmation(p),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                        ? Theme.of(context).colorScheme.error.withOpacity(0.2)
+                                        : Theme.of(context).colorScheme.errorContainer,
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

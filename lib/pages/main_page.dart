@@ -128,6 +128,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final List<Color> tabColors = [
       const Color(0xFF6C63FF),
       const Color(0xFF4CAF50),
@@ -135,15 +136,22 @@ class _MainPageState extends State<MainPage> {
     ];
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: tabColors[_selectedIndex],
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        backgroundColor: isDark
+            ? const Color(0xFF1A1A1A)
+            : tabColors[_selectedIndex],
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: isDark
+                    ? tabColors[_selectedIndex].withOpacity(0.2)
+                    : Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -152,7 +160,7 @@ class _MainPageState extends State<MainPage> {
                     : _selectedIndex == 1
                     ? Icons.store
                     : Icons.bar_chart,
-                color: Colors.white,
+                color: isDark ? tabColors[_selectedIndex] : Colors.white,
                 size: 24,
               ),
             ),
@@ -201,7 +209,7 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           PopupMenuButton<String>(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             icon: const Icon(Icons.more_vert, color: Colors.white),
             onSelected: (value) {
               if (value == 'settings') {
@@ -268,9 +276,10 @@ class _MainPageState extends State<MainPage> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -279,9 +288,9 @@ class _MainPageState extends State<MainPage> {
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           selectedItemColor: tabColors[_selectedIndex],
-          unselectedItemColor: Colors.grey[400],
+          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
           selectedFontSize: 12,
           unselectedFontSize: 12,
           type: BottomNavigationBarType.fixed,

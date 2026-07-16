@@ -69,10 +69,6 @@ class DatabaseHelper {
     );
   }
 
-  // ─────────────────────────────────────────────
-  // LEGACY METHODS (tidak diubah sama sekali)
-  // ─────────────────────────────────────────────
-
   // Insert User (untuk register)
   Future<int> insertUser(User user) async {
     final db = await database;
@@ -94,11 +90,6 @@ class DatabaseHelper {
     }
     return null;
   }
-
-  // ─────────────────────────────────────────────
-  // NEW METHODS — untuk Excel Import
-  // (Tambahan saja, tidak mengubah yang lama)
-  // ─────────────────────────────────────────────
 
   /// Ambil semua kategori (Map nama -> id)
   Future<Map<String, int>> getAllCategoriesAsMap() async {

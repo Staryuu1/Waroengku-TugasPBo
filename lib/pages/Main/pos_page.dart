@@ -126,7 +126,7 @@ class _POSPageState extends State<POSPage> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.payments, color: Color(0xFF4CAF50)),
@@ -144,7 +144,7 @@ class _POSPageState extends State<POSPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: _row('Total', 'Rp ${_format(_total)}', bold: true),
@@ -160,7 +160,7 @@ class _POSPageState extends State<POSPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
                 onChanged: (v) {
                   paid = int.tryParse(v) ?? 0;
@@ -173,18 +173,18 @@ class _POSPageState extends State<POSPage> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: change >= 0
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.red.withOpacity(0.1),
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.errorContainer,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: change >= 0 ? Colors.green : Colors.red,
+                    color: change >= 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                     width: 2,
                   ),
                 ),
                 child: _row(
                   'Kembalian',
                   change >= 0 ? 'Rp ${_format(change)}' : 'Uang Kurang',
-                  color: change >= 0 ? Colors.green : Colors.red,
+                  color: change >= 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.error,
                   bold: true,
                 ),
               ),
@@ -202,7 +202,7 @@ class _POSPageState extends State<POSPage> {
               child: Text(
                 'Batal',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -284,7 +284,7 @@ class _POSPageState extends State<POSPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                disabledBackgroundColor: Colors.grey[300],
+                disabledBackgroundColor: Theme.of(context).disabledColor,
               ),
               child: const Text(
                 'KONFIRMASI',
@@ -301,7 +301,7 @@ class _POSPageState extends State<POSPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+        Text(label, style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurfaceVariant)),
         Text(
           value,
           style: TextStyle(
@@ -410,12 +410,12 @@ class _POSPageState extends State<POSPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
           /// FILTER KATEGORI & SCAN BARCODE
           Container(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surface,
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
@@ -429,7 +429,7 @@ class _POSPageState extends State<POSPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
-                      fillColor: Colors.grey[50],
+                      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                     ),
                     items: [
                       const DropdownMenuItem(
@@ -469,7 +469,7 @@ class _POSPageState extends State<POSPage> {
           /// PRODUK
           Expanded(
             child: Container(
-              color: Colors.grey[100],
+              color: Theme.of(context).colorScheme.surfaceContainerLow,
               child: _products.isEmpty
                   ? Center(
                       child: Column(
@@ -478,13 +478,13 @@ class _POSPageState extends State<POSPage> {
                           Icon(
                             Icons.inventory_2_outlined,
                             size: 64,
-                            color: Colors.grey[400],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Belum ada produk',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               fontSize: 16,
                             ),
                           ),
@@ -501,15 +501,20 @@ class _POSPageState extends State<POSPage> {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            border: Theme.of(context).brightness == Brightness.dark
+                                ? Border.all(color: Colors.white.withOpacity(0.08))
+                                : null,
+                            boxShadow: Theme.of(context).brightness == Brightness.dark
+                                ? []
+                                : [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(
@@ -521,7 +526,7 @@ class _POSPageState extends State<POSPage> {
                               height: 56,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey[100],
+                                color: Theme.of(context).colorScheme.surfaceContainerLow,
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
@@ -532,7 +537,7 @@ class _POSPageState extends State<POSPage> {
                                       )
                                     : Icon(
                                         Icons.inventory_2_outlined,
-                                        color: Colors.grey[400],
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                               ),
                             ),
@@ -550,7 +555,9 @@ class _POSPageState extends State<POSPage> {
                                   Text(
                                     'Rp ${_format(p.price)}',
                                     style: TextStyle(
-                                      color: Colors.green[700],
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.green[400]
+                                          : Colors.green[700],
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13,
                                     ),
@@ -560,7 +567,7 @@ class _POSPageState extends State<POSPage> {
                                     Icons.inventory_outlined,
                                     size: 14,
                                     color: inStock
-                                        ? Colors.grey[600]
+                                        ? Theme.of(context).colorScheme.onSurfaceVariant
                                         : Colors.red,
                                   ),
                                   const SizedBox(width: 4),
@@ -568,7 +575,7 @@ class _POSPageState extends State<POSPage> {
                                     '${p.stock}',
                                     style: TextStyle(
                                       color: inStock
-                                          ? Colors.grey[600]
+                                          ? Theme.of(context).colorScheme.onSurfaceVariant
                                           : Colors.red,
                                       fontSize: 13,
                                     ),
@@ -581,7 +588,7 @@ class _POSPageState extends State<POSPage> {
                                 Icons.add_circle,
                                 color: inStock
                                     ? const Color(0xFF4CAF50)
-                                    : Colors.grey,
+                                    : Theme.of(context).disabledColor,
                                 size: 32,
                               ),
                               onPressed: inStock ? () => _addToCart(p) : null,
@@ -593,12 +600,12 @@ class _POSPageState extends State<POSPage> {
             ),
           ),
 
-          Container(height: 1, color: Colors.grey[300]),
+          Container(height: 1, color: Theme.of(context).colorScheme.outlineVariant),
 
           /// CART
           Expanded(
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               child: _cart.isEmpty
                   ? Center(
                       child: Column(
@@ -607,13 +614,13 @@ class _POSPageState extends State<POSPage> {
                           Icon(
                             Icons.shopping_cart_outlined,
                             size: 64,
-                            color: Colors.grey[400],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Keranjang kosong',
                             style: TextStyle(
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               fontSize: 16,
                             ),
                           ),
@@ -648,7 +655,7 @@ class _POSPageState extends State<POSPage> {
                                     Text(
                                       '${item.qty} x Rp ${_format(item.product.price)}',
                                       style: TextStyle(
-                                        color: Colors.grey[600],
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                                         fontSize: 13,
                                       ),
                                     ),
@@ -659,12 +666,12 @@ class _POSPageState extends State<POSPage> {
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.red.withOpacity(0.1),
+                                      color: Theme.of(context).colorScheme.errorContainer,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: IconButton(
                                       icon: const Icon(Icons.remove, size: 18),
-                                      color: Colors.red,
+                                      color: Theme.of(context).colorScheme.onErrorContainer,
                                       onPressed: () => _removeFromCart(item),
                                       padding: const EdgeInsets.all(8),
                                       constraints: const BoxConstraints(),
@@ -673,12 +680,12 @@ class _POSPageState extends State<POSPage> {
                                   const SizedBox(width: 8),
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.1),
+                                      color: Theme.of(context).colorScheme.primaryContainer,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: IconButton(
                                       icon: const Icon(Icons.add, size: 18),
-                                      color: Colors.green,
+                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
                                       onPressed: item.qty < item.product.stock
                                           ? () {
                                               setState(() {
@@ -713,7 +720,7 @@ class _POSPageState extends State<POSPage> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -733,7 +740,7 @@ class _POSPageState extends State<POSPage> {
                       'TOTAL',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -760,7 +767,7 @@ class _POSPageState extends State<POSPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    disabledBackgroundColor: Colors.grey[300],
+                    disabledBackgroundColor: Theme.of(context).disabledColor,
                   ),
                   child: const Row(
                     children: [

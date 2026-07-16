@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import '../../../services/printer_service.dart';
+import '../../../services/theme_service.dart';
+import '../../../pages/theme_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,6 +13,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final _printerService = PrinterService.instance;
+  final ThemeService _themeService = ThemeService.instance;
 
   // ── Store info controllers ──
   final _nameCtrl = TextEditingController();
@@ -27,14 +30,22 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _themeService.addListener(_handleThemeChanged);
     _loadInitial();
   }
 
   @override
   void dispose() {
+    _themeService.removeListener(_handleThemeChanged);
     _nameCtrl.dispose();
     _addressCtrl.dispose();
     super.dispose();
+  }
+
+  void _handleThemeChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadInitial() async {
@@ -173,20 +184,59 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Pengaturan',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF4CAF50),
+        backgroundColor: isDark ? const Color(0xFF1A1A1A) : const Color(0xFF4CAF50),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _SectionHeader(title: 'Tema', icon: Icons.brightness_6_rounded),
+          const SizedBox(height: 12),
+          _Card(
+            child: InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ThemePage()),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Mode Tampilan',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _themeService.themeMode == ThemeMode.system
+                              ? 'Sistem'
+                              : _themeService.themeMode == ThemeMode.dark
+                                  ? 'Gelap'
+                                  : 'Terang',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           // ── Section: Info Toko ──
           _SectionHeader(title: 'Info Toko', icon: Icons.store_rounded),
           const SizedBox(height: 12),
@@ -202,7 +252,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: isDark ? const Color(0xFF2A2A2A) : Colors.grey[50],
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -216,7 +266,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: isDark ? const Color(0xFF2A2A2A) : Colors.grey[50],
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -412,11 +462,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                 )
                               : isActive
                               ? Chip(
-                                  label: const Text(
+                                  label: Text(
                                     'Terhubung',
-                                    style: TextStyle(fontSize: 11),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: isDark ? Colors.green[300] : Colors.green[700],
+                                    ),
                                   ),
-                                  backgroundColor: Colors.green[50],
+                                  backgroundColor: isDark ? Colors.green.withOpacity(0.15) : Colors.green[50],
                                   labelStyle: TextStyle(
                                     color: Colors.green[700],
                                   ),
@@ -470,10 +523,12 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF4CAF50),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.greenAccent[400]
+                : const Color(0xFF4CAF50),
           ),
         ),
       ],
@@ -488,19 +543,25 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        border: isDark
+            ? Border.all(color: Colors.white.withOpacity(0.08))
+            : null,
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
       ),
       child: child,
     );

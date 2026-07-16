@@ -14,22 +14,32 @@ class ManagementPage extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withOpacity(0.8), color],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: isDark ? const Color(0xFF1E1E1E) : null,
+        gradient: isDark
+            ? null
+            : LinearGradient(
+                colors: [color.withOpacity(0.8), color],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        border: isDark
+            ? Border.all(color: color.withOpacity(0.3), width: 1)
+            : null,
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -43,10 +53,12 @@ class ManagementPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: isDark
+                        ? color.withOpacity(0.2)
+                        : Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(icon, size: 36, color: Colors.white),
+                  child: Icon(icon, size: 36, color: isDark ? color : Colors.white),
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -55,10 +67,12 @@ class ManagementPage extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: isDark
+                              ? Colors.white.withOpacity(0.9)
+                              : Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -66,7 +80,9 @@ class ManagementPage extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
+                          color: isDark
+                              ? Colors.white.withOpacity(0.5)
+                              : Colors.white.withOpacity(0.9),
                         ),
                       ),
                     ],
@@ -75,12 +91,14 @@ class ManagementPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: isDark
+                        ? color.withOpacity(0.2)
+                        : Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_forward_ios,
-                    color: Colors.white,
+                    color: isDark ? color : Colors.white,
                     size: 18,
                   ),
                 ),
@@ -94,14 +112,12 @@ class ManagementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.grey[50]!, Colors.grey[100]!],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
+      color: isDark
+          ? Theme.of(context).scaffoldBackgroundColor
+          : Colors.grey[50],
       child: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -116,13 +132,16 @@ class ManagementPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Kelola data produk dan kategori',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -180,22 +199,36 @@ class ManagementPage extends StatelessWidget {
             margin: const EdgeInsets.only(top: 8),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.blue[50],
+              color: isDark
+                  ? const Color(0xFF1E1E1E)
+                  : Colors.blue[50],
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.blue[200]!, width: 1),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withOpacity(0.1)
+                    : Colors.blue[200]!,
+                width: 1,
+              ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.info_outline_rounded,
-                  color: Colors.blue[700],
+                  color: isDark
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.blue[700],
                   size: 24,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Pilih menu untuk mulai mengelola data',
-                    style: TextStyle(color: Colors.blue[900], fontSize: 14),
+                    style: TextStyle(
+                      color: isDark
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                          : Colors.blue[900],
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ],
