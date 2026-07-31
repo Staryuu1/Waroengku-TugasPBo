@@ -35,3 +35,13 @@ Aplikasi ini mendukung manajemen produk, kategori, transaksi, laporan, serta aut
 git clone https://github.com/Staryuu1/Waroengku-TugasPBo.git
 cd Waroengku-TugasPBo
 ```
+
+### 2. Install Dependency
+```bash
+flutter pub get
+```
+
+### 3. Jalankan Aplikasi
+```bash
+flutter run
+```
